@@ -15,12 +15,10 @@ class User extends Authenticatable
         'email',
         'password',
         'laracon_uuid',
-        'pin'
     ];
 
     protected $hidden = [
         'password',
-        'pin',
         'remember_token',
     ];
 
