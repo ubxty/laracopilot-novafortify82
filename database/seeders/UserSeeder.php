@@ -10,48 +10,58 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        $users = [
-            [
-                'name' => 'Taylor Otwell',
-                'email' => 'taylor@laravel.com',
-                'password' => Hash::make('password'),
-                'github_username' => 'taylorotwell',
-                'qr_code_verified' => true
-            ],
-            [
-                'name' => 'Mohamed Said',
-                'email' => 'mohamed@laravel.com',
-                'password' => Hash::make('password'),
-                'github_username' => 'themsaid',
-                'qr_code_verified' => true
-            ],
-            [
-                'name' => 'Freek Van der Herten',
-                'email' => 'freek@spatie.be',
-                'password' => Hash::make('password'),
-                'github_username' => 'freekmurze',
-                'qr_code_verified' => true
-            ],
-            [
-                'name' => 'Nuno Maduro',
-                'email' => 'nuno@laravel.com',
-                'password' => Hash::make('password'),
-                'github_username' => 'nunomaduro',
-                'qr_code_verified' => true
-            ],
-            [
-                'name' => 'Jess Archer',
-                'email' => 'jess@laravel.com',
-                'password' => Hash::make('password'),
-                'github_username' => 'jessarcher',
-                'qr_code_verified' => true
-            ]
-        ];
+        // Create example user from LaraconEU QR
+        User::create([
+            'name' => 'Ravdeep Singh',
+            'full_name' => 'Ravdeep Singh',
+            'email' => 'ravdeep@example.com',
+            'password' => Hash::make('password123'),
+            'laracon_uuid' => 'ae7616a3-572c-48d6-ae2a-80a7221bdd3f',
+            'role' => 'user',
+            'email_verified_at' => now()
+        ]);
 
-        foreach ($users as $userData) {
-            User::create($userData);
-        }
+        // Create admin user
+        User::create([
+            'name' => 'Admin User',
+            'full_name' => 'Administrator',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('admin123'),
+            'role' => 'admin',
+            'email_verified_at' => now()
+        ]);
 
+        // Create additional test users
+        User::create([
+            'name' => 'John Doe',
+            'full_name' => 'John Alexander Doe',
+            'email' => 'john@example.com',
+            'password' => Hash::make('password123'),
+            'laracon_uuid' => '123e4567-e89b-12d3-a456-426614174000',
+            'role' => 'user',
+            'email_verified_at' => now()
+        ]);
+
+        User::create([
+            'name' => 'Jane Smith',
+            'full_name' => 'Jane Elizabeth Smith',
+            'email' => 'jane@example.com',
+            'password' => Hash::make('password123'),
+            'laracon_uuid' => '987fcdeb-51a2-43d7-9876-fedcba098765',
+            'role' => 'user',
+            'email_verified_at' => now()
+        ]);
+
+        User::create([
+            'name' => 'Mike Johnson',
+            'full_name' => 'Michael Robert Johnson',
+            'email' => 'mike@example.com',
+            'password' => Hash::make('password123'),
+            'role' => 'user',
+            'email_verified_at' => now()
+        ]);
+
+        // Generate additional random users using factory
         User::factory()->count(15)->create();
     }
 }
