@@ -30,8 +30,16 @@ class AuthController extends Controller
                 'user_logged_in' => true,
                 'user_id' => $user->id,
                 'user_name' => $user->name,
-                'user_email' => $user->email
+                'user_full_name' => $user->full_name ?? $user->name,
+                'user_email' => $user->email,
+                'user_role' => $user->role
             ]);
+            
+            // Redirect based on role
+            if ($user->isAdmin()) {
+                return redirect()->route('admin.dashboard');
+            }
+            
             return redirect()->route('dashboard');
         }
 
@@ -56,15 +64,19 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $request->name,
+            'full_name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            'role' => 'user'
         ]);
 
         session([
             'user_logged_in' => true,
             'user_id' => $user->id,
             'user_name' => $user->name,
-            'user_email' => $user->email
+            'user_full_name' => $user->full_name,
+            'user_email' => $user->email,
+            'user_role' => $user->role
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Account created successfully!');
@@ -94,8 +106,8 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            // Check if UUID already exists
-            $existingUser = User::where('github_id', $qrData['uuid'])->first();
+            // Check if UUID already exists in laracon_uuid field
+            $existingUser = User::where('laracon_uuid', $qrData['uuid'])->first();
             if ($existingUser) {
                 return response()->json([
                     'success' => false,
@@ -136,9 +148,11 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => session('qr_name'),
+            'full_name' => session('qr_name'),
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'github_id' => session('qr_uuid')
+            'laracon_uuid' => session('qr_uuid'),
+            'role' => 'user'
         ]);
 
         // Clear QR session data
@@ -149,7 +163,9 @@ class AuthController extends Controller
             'user_logged_in' => true,
             'user_id' => $user->id,
             'user_name' => $user->name,
-            'user_email' => $user->email
+            'user_full_name' => $user->full_name,
+            'user_email' => $user->email,
+            'user_role' => $user->role
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Welcome! Your account has been created successfully.');

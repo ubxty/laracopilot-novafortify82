@@ -18,6 +18,7 @@ class User extends Authenticatable
         'github_id',
         'github_token',
         'github_refresh_token',
+        'qr_code',
         'laracon_uuid',
         'role'
     ];
@@ -31,14 +32,17 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed'
+        'password' => 'hashed',
+        'role' => 'string'
     ];
 
+    // Relationships
     public function projects()
     {
         return $this->hasMany(Project::class);
     }
 
+    // Helper methods
     public function isAdmin()
     {
         return $this->role === 'admin';

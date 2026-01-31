@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('laracon_uuid')->unique()->nullable()->after('email');
-            $table->string('full_name')->after('name');
+            $table->string('full_name')->nullable()->after('name');
             $table->enum('role', ['user', 'admin'])->default('user')->after('password');
             
             // Add index for laracon_uuid for faster lookups
