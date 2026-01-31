@@ -9,20 +9,24 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('laracon_uuid')->unique()->nullable()->after('email');
-            $table->string('full_name')->nullable()->after('name');
-            $table->enum('role', ['user', 'admin'])->default('user')->after('password');
-            
-            // Add index for laracon_uuid for faster lookups
-            $table->index('laracon_uuid');
+            if (!Schema::hasColumn('users', 'laracon_uuid')) {
+                $table->string('laracon_uuid')->nullable()->unique()->after('email_verified_at');
+            }
+            if (!Schema::hasColumn('users', 'pin')) {
+                $table->string('pin', 6)->nullable()->after('password');
+            }
         });
     }
 
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex(['laracon_uuid']);
-            $table->dropColumn(['laracon_uuid', 'full_name', 'role']);
+            if (Schema::hasColumn('users', 'laracon_uuid')) {
+                $table->dropColumn('laracon_uuid');
+            }
+            if (Schema::hasColumn('users', 'pin')) {
+                $table->dropColumn('pin');
+            }
         });
     }
 };
