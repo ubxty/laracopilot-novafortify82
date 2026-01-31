@@ -28,7 +28,7 @@
             @endif
 
             <!-- Login Form -->
-            <form action="{{ route('artisan.authenticate') }}" method="POST" class="space-y-6">
+            <form action="{{ url('/artisan/authenticate') }}" method="POST" class="space-y-6">
                 @csrf
                 <div>
                     <label class="block text-gray-700 font-semibold mb-2">
@@ -62,7 +62,7 @@
 
             <!-- Back to Home -->
             <div class="mt-6 text-center">
-                <a href="{{ route('home') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
+                <a href="{{ url('/') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Home
                 </a>
             </div>

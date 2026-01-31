@@ -13,16 +13,16 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center space-x-8">
-                    <a href="{{ route('home') }}" class="text-2xl font-bold">Laravel Portal</a>
+                    <a href="{{ url('/') }}" class="text-2xl font-bold">Laravel Portal</a>
                     <div class="hidden md:flex space-x-4">
-                        <a href="{{ route('artisan.index') }}" class="bg-indigo-700 px-3 py-2 rounded">Artisan Terminal</a>
+                        <a href="{{ url('/artisan') }}" class="bg-indigo-700 px-3 py-2 rounded">Artisan Terminal</a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm flex items-center">
                         <i class="fas fa-user-shield mr-2"></i>Terminal Access
                     </span>
-                    <form action="{{ route('artisan.logout') }}" method="POST">
+                    <form action="{{ url('/artisan/logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded transition">
                             <i class="fas fa-sign-out-alt mr-2"></i>Logout
@@ -44,10 +44,10 @@
                 <p class="text-gray-600 mt-2">Execute Laravel Artisan commands and view real-time output</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('artisan.refresh') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
+                <a href="{{ url('/artisan/refresh') }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition">
                     <i class="fas fa-sync-alt mr-2"></i>Refresh Logs
                 </a>
-                <form action="{{ route('artisan.clear.logs') }}" method="POST" class="inline">
+                <form action="{{ url('/artisan/clear-logs') }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition" onclick="return confirm('Clear all artisan logs?')">
                         <i class="fas fa-trash mr-2"></i>Clear Logs
@@ -90,7 +90,7 @@
                 <i class="fas fa-play-circle text-indigo-600 mr-2"></i>
                 Execute Artisan Command
             </h2>
-            <form action="{{ route('artisan.run') }}" method="POST" class="space-y-4">
+            <form action="{{ url('/artisan/run') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
                     <label class="block text-gray-700 font-semibold mb-2">Command</label>
