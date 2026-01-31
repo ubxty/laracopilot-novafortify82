@@ -12,15 +12,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->string('short_description', 300);
             $table->text('description');
             $table->string('github_url');
             $table->string('demo_url')->nullable();
             $table->string('image_url')->nullable();
             $table->json('tags')->nullable();
+            $table->string('project_type')->nullable();
             $table->integer('stars')->default(0);
             $table->integer('forks')->default(0);
             $table->boolean('featured')->default(false);
-            $table->boolean('active')->default(true);
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }
