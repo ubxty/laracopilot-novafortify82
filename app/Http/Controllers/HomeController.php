@@ -8,55 +8,83 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $featuredProjects = [
+        $features = [
             [
-                'id' => 1,
-                'name' => 'Laravel Analytics Dashboard',
-                'description' => 'A comprehensive analytics dashboard built with Laravel and Chart.js for tracking application metrics.',
-                'author' => 'Sarah Chen',
-                'github_url' => 'https://github.com/sarahchen/laravel-analytics',
-                'demo_url' => 'https://analytics-demo.laravel.com',
-                'stars' => 2847,
-                'forks' => 421,
-                'tags' => ['Analytics', 'Dashboard', 'Charts'],
-                'created_at' => '2024-01-15',
-                'featured' => true
+                'icon' => '🚀',
+                'title' => 'Fast Performance',
+                'description' => 'Built with modern technologies for lightning-fast load times and optimal user experience.'
             ],
             [
-                'id' => 2,
-                'name' => 'API Rate Limiter',
-                'description' => 'Advanced rate limiting package for Laravel APIs with Redis backend and flexible configuration.',
-                'author' => 'Marcus Rodriguez',
-                'github_url' => 'https://github.com/marcusr/api-rate-limiter',
-                'demo_url' => null,
-                'stars' => 1923,
-                'forks' => 287,
-                'tags' => ['API', 'Security', 'Performance'],
-                'created_at' => '2024-02-08',
-                'featured' => true
+                'icon' => '🎨',
+                'title' => 'Beautiful Design',
+                'description' => 'Carefully crafted interfaces with attention to detail and user-centered design principles.'
             ],
             [
-                'id' => 3,
-                'name' => 'Laravel Queue Monitor',
-                'description' => 'Real-time queue monitoring and management tool with beautiful UI and detailed job tracking.',
-                'author' => 'Alex Thompson',
-                'github_url' => 'https://github.com/alexthompson/queue-monitor',
-                'demo_url' => 'https://queue-demo.laravel.com',
-                'stars' => 3156,
-                'forks' => 512,
-                'tags' => ['Queue', 'Monitoring', 'DevTools'],
-                'created_at' => '2024-01-22',
-                'featured' => true
+                'icon' => '🔒',
+                'title' => 'Secure & Reliable',
+                'description' => 'Enterprise-grade security measures to protect your data and ensure business continuity.'
+            ],
+            [
+                'icon' => '📱',
+                'title' => 'Mobile Responsive',
+                'description' => 'Fully responsive design that works seamlessly across all devices and screen sizes.'
             ]
         ];
 
-        $stats = [
-            'total_projects' => 1247,
-            'total_developers' => 892,
-            'github_stars' => 45621,
-            'active_contributors' => 156
+        $services = [
+            [
+                'title' => 'Web Development',
+                'description' => 'Custom web applications built with Laravel, React, and modern web technologies.',
+                'color' => 'from-blue-500 to-blue-700'
+            ],
+            [
+                'title' => 'Mobile Apps',
+                'description' => 'Native and cross-platform mobile applications for iOS and Android devices.',
+                'color' => 'from-purple-500 to-purple-700'
+            ],
+            [
+                'title' => 'Cloud Solutions',
+                'description' => 'Scalable cloud infrastructure and deployment solutions for your business.',
+                'color' => 'from-green-500 to-green-700'
+            ],
+            [
+                'title' => 'UI/UX Design',
+                'description' => 'Beautiful and intuitive user interfaces designed for maximum engagement.',
+                'color' => 'from-pink-500 to-pink-700'
+            ],
+            [
+                'title' => 'Consulting',
+                'description' => 'Expert technology consulting to guide your digital transformation journey.',
+                'color' => 'from-indigo-500 to-indigo-700'
+            ],
+            [
+                'title' => 'Support & Maintenance',
+                'description' => '24/7 technical support and ongoing maintenance for your applications.',
+                'color' => 'from-orange-500 to-orange-700'
+            ]
         ];
 
-        return view('welcome', compact('featuredProjects', 'stats'));
+        $testimonials = [
+            [
+                'name' => 'Sarah Johnson',
+                'position' => 'CEO, TechStart Inc',
+                'content' => 'Working with this team has been an absolute pleasure. They delivered our project on time and exceeded all expectations.',
+                'rating' => 5
+            ],
+            [
+                'name' => 'Michael Chen',
+                'position' => 'CTO, Digital Solutions',
+                'content' => 'The quality of work and attention to detail is outstanding. Our application performs flawlessly and our users love it.',
+                'rating' => 5
+            ],
+            [
+                'name' => 'Emily Rodriguez',
+                'position' => 'Product Manager, InnovateCo',
+                'content' => 'Professional, responsive, and highly skilled. They transformed our ideas into a beautiful, functional product.',
+                'rating' => 5
+            ]
+        ];
+
+        return view('welcome', compact('features', 'services', 'testimonials'));
     }
 }
