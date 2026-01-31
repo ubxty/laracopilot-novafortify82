@@ -36,34 +36,21 @@
                         <!-- Login Method Toggle -->
                         <div class="grid grid-cols-2 gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
                             <button 
-                                id="qr-mode-btn" 
-                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-red-600 to-black text-white shadow-md"
-                            >
-                                🎫 Laracon QR
-                            </button>
-                            <button 
                                 id="manual-mode-btn" 
-                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-white"
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-red-600 to-black text-white shadow-md"
                             >
                                 🔐 Manual Login
                             </button>
-                        </div>
-
-                        <!-- QR Login Section -->
-                        <div id="qr-login-section" class="">
-                            <div class="mb-6">
-                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
-                                    <p class="text-center text-sm text-gray-700 mb-4 font-medium">Scan your Laracon badge to login instantly</p>
-                                    <div class="bg-white rounded-lg overflow-hidden shadow-inner">
-                                        <video id="qr-video" class="w-full" style="max-height: 280px; object-fit: cover;"></video>
-                                    </div>
-                                    <div id="qr-result" class="mt-3 text-center text-xs text-gray-600 font-medium"></div>
-                                </div>
-                            </div>
+                            <button 
+                                id="qr-mode-btn" 
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-white"
+                            >
+                                🎫 Laracon QR
+                            </button>
                         </div>
 
                         <!-- Manual Login Section -->
-                        <div id="manual-login-section" class="hidden">
+                        <div id="manual-login-section" class="">
                             <form action="{{ route('login') }}" method="POST">
                                 @csrf
                                 
@@ -116,6 +103,42 @@
                             </form>
                         </div>
 
+                        <!-- QR Login Section -->
+                        <div id="qr-login-section" class="hidden">
+                            <div class="mb-6">
+                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
+                                    <p class="text-center text-sm text-gray-700 mb-4 font-medium">Scan your Laracon badge to login instantly</p>
+                                    <div class="bg-white rounded-lg overflow-hidden shadow-inner">
+                                        <video id="qr-video" class="w-full" style="max-height: 280px; object-fit: cover;"></video>
+                                    </div>
+                                    <div id="qr-result" class="mt-3 text-center text-xs text-gray-600 font-medium"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- PIN Entry Modal (hidden by default) -->
+                            <div id="pin-entry-modal" class="hidden">
+                                <div class="bg-white rounded-lg p-6 border-2 border-red-500">
+                                    <h3 class="text-lg font-bold text-gray-800 mb-2 text-center">Enter Your PIN</h3>
+                                    <p class="text-sm text-gray-600 mb-4 text-center" id="pin-user-info"></p>
+                                    <div class="flex gap-2 justify-center mb-4">
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="0" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="1" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="2" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="3" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="4" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="5" />
+                                    </div>
+                                    <div id="pin-error" class="text-red-500 text-xs text-center mb-3 hidden"></div>
+                                    <button onclick="submitQRPin()" class="w-full bg-gradient-to-r from-red-600 to-black text-white py-3 rounded-lg hover:from-red-700 hover:to-gray-900 font-semibold">
+                                        Login
+                                    </button>
+                                    <button onclick="cancelPinEntry()" class="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-semibold text-sm">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mt-6 text-center">
                             <p class="text-gray-600 text-sm">Don't have an account? <a href="{{ route('register') }}" class="text-red-600 hover:text-red-700 font-semibold">Register here</a></p>
                         </div>
@@ -126,15 +149,31 @@
     </section>
 
     @include('partials.footer')
+    @include('partials.debug')
 
     <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
+        let currentQRData = null;
+        let currentUUID = null;
+
         // Mode Toggle
         const qrModeBtn = document.getElementById('qr-mode-btn');
         const manualModeBtn = document.getElementById('manual-mode-btn');
         const qrSection = document.getElementById('qr-login-section');
         const manualSection = document.getElementById('manual-login-section');
         let scanning = false;
+
+        manualModeBtn.addEventListener('click', () => {
+            manualModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            manualModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
+            qrModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            qrModeBtn.classList.add('text-gray-600', 'hover:bg-white');
+            manualSection.classList.remove('hidden');
+            qrSection.classList.add('hidden');
+            document.getElementById('pin-entry-modal').classList.add('hidden');
+            stopQRScanner();
+            document.getElementById('email').focus();
+        });
 
         qrModeBtn.addEventListener('click', () => {
             qrModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
@@ -146,18 +185,7 @@
             if (!scanning) startQRScanner();
         });
 
-        manualModeBtn.addEventListener('click', () => {
-            manualModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
-            manualModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
-            qrModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
-            qrModeBtn.classList.add('text-gray-600', 'hover:bg-white');
-            manualSection.classList.remove('hidden');
-            qrSection.classList.add('hidden');
-            stopQRScanner();
-            document.querySelector('.pin-input').focus();
-        });
-
-        // PIN Input Handler
+        // PIN Input Handler for manual login
         const pinInputs = document.querySelectorAll('.pin-input');
         const passwordHidden = document.getElementById('password-hidden');
 
@@ -196,6 +224,44 @@
             passwordHidden.value = pin;
         }
 
+        // PIN Input Handler for QR modal
+        const qrPinInputs = document.querySelectorAll('.qr-pin-input');
+        qrPinInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value.length === 1 && index < qrPinInputs.length - 1) {
+                    qrPinInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    qrPinInputs[index - 1].focus();
+                }
+                if (e.key === 'Enter') {
+                    submitQRPin();
+                }
+            });
+        });
+
+        function submitQRPin() {
+            const pin = Array.from(qrPinInputs).map(input => input.value).join('');
+            if (pin.length !== 6) {
+                document.getElementById('pin-error').textContent = 'Please enter all 6 digits';
+                document.getElementById('pin-error').classList.remove('hidden');
+                return;
+            }
+            processQRLogin(currentQRData, pin);
+        }
+
+        function cancelPinEntry() {
+            document.getElementById('pin-entry-modal').classList.add('hidden');
+            qrPinInputs.forEach(input => input.value = '');
+            document.getElementById('pin-error').classList.add('hidden');
+            scanning = true;
+            requestAnimationFrame(scanQRCode);
+        }
+
         // QR Code Scanner
         const video = document.getElementById('qr-video');
         const resultDiv = document.getElementById('qr-result');
@@ -214,6 +280,13 @@
                 resultDiv.textContent = '📷 Camera ready - Point at Laracon badge';
             } catch (err) {
                 resultDiv.textContent = '⚠️ Camera access denied';
+                if (window.logApiRequest) {
+                    logApiRequest({
+                        type: 'Camera Error',
+                        error: err.message || err.toString(),
+                        success: false
+                    });
+                }
                 console.error('Camera error:', err);
             }
         }
@@ -239,7 +312,8 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    resultDiv.textContent = '✅ QR detected! Authenticating...';
+                    resultDiv.textContent = '✅ QR detected! Processing...';
+                    currentQRData = code.data;
                     processQRLogin(code.data);
                     return;
                 }
@@ -247,41 +321,129 @@
             requestAnimationFrame(scanQRCode);
         }
 
-        function processQRLogin(qrData) {
+        function processQRLogin(qrData, pin = null) {
             scanning = false;
+            const startTime = Date.now();
+            
+            const payload = {
+                qr_code: qrData,
+                laracon_login: true
+            };
+            
+            if (pin) {
+                payload.pin = pin;
+            }
+            
+            if (window.logApiRequest) {
+                logApiRequest({
+                    type: 'QR Login Request',
+                    url: '{{ route('login') }}',
+                    method: 'POST',
+                    params: payload
+                });
+            }
             
             fetch('{{ route('login') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    qr_code: qrData,
-                    laracon_login: true
-                })
+                body: JSON.stringify(payload)
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                const duration = Date.now() - startTime;
+                if (!response.ok && response.status !== 404 && response.status !== 401) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json().then(data => ({
+                    data,
+                    status: response.status,
+                    duration
+                }));
+            })
+            .then(({ data, status, duration }) => {
                 if (data.success) {
                     resultDiv.textContent = '✅ Login successful! Redirecting...';
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR Login Success',
+                            response: data,
+                            statusCode: status,
+                            success: true,
+                            duration
+                        });
+                    }
                     window.location.href = data.redirect || '{{ route('dashboard') }}';
+                } else if (data.action === 'register') {
+                    // First time - redirect to registration
+                    resultDiv.textContent = '📝 First time badge scan - Redirecting to registration...';
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR First Time Scan',
+                            response: data,
+                            statusCode: status,
+                            success: false,
+                            duration
+                        });
+                    }
+                    setTimeout(() => {
+                        window.location.href = '{{ route('register') }}?qr=' + encodeURIComponent(qrData);
+                    }, 1500);
+                } else if (data.action === 'enter_pin') {
+                    // Show PIN entry modal
+                    currentUUID = data.uuid;
+                    document.getElementById('pin-user-info').textContent = `Welcome back, ${data.name}!`;
+                    document.getElementById('qr-result').parentElement.classList.add('hidden');
+                    document.getElementById('pin-entry-modal').classList.remove('hidden');
+                    qrPinInputs[0].focus();
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR Prompt PIN',
+                            response: data,
+                            statusCode: status,
+                            success: false,
+                            duration
+                        });
+                    }
                 } else {
-                    resultDiv.textContent = '❌ Invalid QR code';
-                    scanning = true;
-                    requestAnimationFrame(scanQRCode);
+                    resultDiv.textContent = '❌ ' + (data.message || 'Error processing QR');
+                    document.getElementById('pin-error').textContent = data.message;
+                    document.getElementById('pin-error').classList.remove('hidden');
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR Login Failed',
+                            response: data,
+                            statusCode: status,
+                            success: false,
+                            duration
+                        });
+                    }
+                    if (!pin) {
+                        scanning = true;
+                        requestAnimationFrame(scanQRCode);
+                    }
                 }
             })
             .catch(error => {
+                const duration = Date.now() - startTime;
                 resultDiv.textContent = '❌ Error processing QR';
+                if (window.logApiRequest) {
+                    logApiRequest({
+                        type: 'QR Login Error',
+                        error: error.message || error.toString(),
+                        success: false,
+                        duration
+                    });
+                }
                 console.error('QR login error:', error);
                 scanning = true;
                 requestAnimationFrame(scanQRCode);
             });
         }
-
-        // Auto-start QR scanner
-        startQRScanner();
     </script>
 </body>
 </html>

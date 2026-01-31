@@ -15,6 +15,7 @@ class User extends Authenticatable
         'email',
         'password',
         'laracon_uuid',
+        'laracon_badge_scanned'
     ];
 
     protected $hidden = [
@@ -22,16 +23,19 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'laracon_badge_scanned' => 'boolean'
+    ];
 
     public function projects()
     {
         return $this->hasMany(Project::class);
+    }
+
+    public function opensourceProjects()
+    {
+        return $this->hasMany(OpensourceProject::class);
     }
 }

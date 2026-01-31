@@ -36,34 +36,21 @@
                         <!-- Register Method Toggle -->
                         <div class="grid grid-cols-2 gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
                             <button 
-                                id="qr-mode-btn" 
-                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-red-600 to-black text-white shadow-md"
-                            >
-                                🎫 Laracon QR
-                            </button>
-                            <button 
                                 id="manual-mode-btn" 
-                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-white"
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-red-600 to-black text-white shadow-md"
                             >
                                 ✍️ Manual Register
                             </button>
-                        </div>
-
-                        <!-- QR Register Section -->
-                        <div id="qr-register-section" class="">
-                            <div class="mb-6">
-                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
-                                    <p class="text-center text-sm text-gray-700 mb-4 font-medium">Scan your Laracon badge to register instantly</p>
-                                    <div class="bg-white rounded-lg overflow-hidden shadow-inner">
-                                        <video id="qr-video" class="w-full" style="max-height: 280px; object-fit: cover;"></video>
-                                    </div>
-                                    <div id="qr-result" class="mt-3 text-center text-xs text-gray-600 font-medium"></div>
-                                </div>
-                            </div>
+                            <button 
+                                id="qr-mode-btn" 
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-white"
+                            >
+                                🎫 Laracon QR
+                            </button>
                         </div>
 
                         <!-- Manual Register Section -->
-                        <div id="manual-register-section" class="hidden">
+                        <div id="manual-register-section" class="">
                             <form action="{{ route('register') }}" method="POST">
                                 @csrf
                                 
@@ -144,6 +131,67 @@
                             </form>
                         </div>
 
+                        <!-- QR Register Section -->
+                        <div id="qr-register-section" class="hidden">
+                            <div id="qr-setup-form" class="hidden">
+                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200 mb-4">
+                                    <p class="text-center text-sm font-semibold text-gray-800 mb-2">✅ Badge Scanned Successfully!</p>
+                                    <p class="text-center text-xs text-gray-600" id="qr-badge-name"></p>
+                                </div>
+                                
+                                <form id="qr-registration-form">
+                                    <div class="mb-4">
+                                        <label class="block text-gray-700 font-semibold mb-2 text-sm">Your Email</label>
+                                        <input 
+                                            type="email" 
+                                            id="qr-email" 
+                                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" 
+                                            placeholder="your@email.com"
+                                            required
+                                        >
+                                    </div>
+                                    
+                                    <div class="mb-5">
+                                        <label class="block text-gray-700 font-semibold mb-2 text-sm">Create 6-Digit PIN</label>
+                                        <div class="flex gap-2 justify-center">
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="0" />
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="1" />
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="2" />
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="3" />
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="4" />
+                                            <input type="text" maxlength="1" class="w-12 h-12 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 qr-pin-input" data-index="5" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="qr-error" class="text-red-500 text-xs text-center mb-3 hidden"></div>
+                                    
+                                    <button 
+                                        type="submit" 
+                                        class="w-full bg-gradient-to-r from-red-600 to-black text-white py-3 rounded-lg hover:from-red-700 hover:to-gray-900 font-semibold"
+                                    >
+                                        Complete Registration
+                                    </button>
+                                    <button 
+                                        type="button"
+                                        onclick="cancelQRSetup()"
+                                        class="w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-semibold text-sm"
+                                    >
+                                        Cancel
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <div id="qr-scanner-area">
+                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
+                                    <p class="text-center text-sm text-gray-700 mb-4 font-medium">Scan your Laracon badge to register instantly</p>
+                                    <div class="bg-white rounded-lg overflow-hidden shadow-inner">
+                                        <video id="qr-video" class="w-full" style="max-height: 280px; object-fit: cover;"></video>
+                                    </div>
+                                    <div id="qr-result" class="mt-3 text-center text-xs text-gray-600 font-medium"></div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mt-6 text-center">
                             <p class="text-gray-600 text-sm">Already have an account? <a href="{{ route('login') }}" class="text-red-600 hover:text-red-700 font-semibold">Login here</a></p>
                         </div>
@@ -154,9 +202,16 @@
     </section>
 
     @include('partials.footer')
+    @include('partials.debug')
 
     <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
+        let currentQRData = null;
+        
+        // Check for QR parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const qrParam = urlParams.get('qr');
+        
         // Mode Toggle
         const qrModeBtn = document.getElementById('qr-mode-btn');
         const manualModeBtn = document.getElementById('manual-mode-btn');
@@ -164,15 +219,11 @@
         const manualSection = document.getElementById('manual-register-section');
         let scanning = false;
 
-        qrModeBtn.addEventListener('click', () => {
-            qrModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
-            qrModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
-            manualModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
-            manualModeBtn.classList.add('text-gray-600', 'hover:bg-white');
-            qrSection.classList.remove('hidden');
-            manualSection.classList.add('hidden');
-            if (!scanning) startQRScanner();
-        });
+        if (qrParam) {
+            // Automatically switch to QR mode and show setup form
+            qrModeBtn.click();
+            showQRSetupForm(qrParam);
+        }
 
         manualModeBtn.addEventListener('click', () => {
             manualModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
@@ -185,7 +236,17 @@
             document.getElementById('name').focus();
         });
 
-        // PIN Input Handler
+        qrModeBtn.addEventListener('click', () => {
+            qrModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            qrModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
+            manualModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            manualModeBtn.classList.add('text-gray-600', 'hover:bg-white');
+            qrSection.classList.remove('hidden');
+            manualSection.classList.add('hidden');
+            if (!scanning && !qrParam) startQRScanner();
+        });
+
+        // PIN Input Handler for manual register
         const pinInputs = document.querySelectorAll('.pin-input');
         const passwordHidden = document.getElementById('password-hidden');
         const pinConfirmInputs = document.querySelectorAll('.pin-confirm-input');
@@ -225,11 +286,53 @@
 
         function updateHiddenInput(inputs, hiddenInput) {
             const pin = Array.from(inputs).map(input => input.value).join('');
-            hiddenInput.value = pin;
+            if (hiddenInput) hiddenInput.value = pin;
         }
 
         setupPinInputs(pinInputs, passwordHidden);
         setupPinInputs(pinConfirmInputs, passwordConfirmationHidden);
+
+        // QR PIN inputs
+        const qrPinInputs = document.querySelectorAll('.qr-pin-input');
+        setupPinInputs(qrPinInputs, null);
+
+        // QR Registration Form
+        document.getElementById('qr-registration-form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('qr-email').value;
+            const pin = Array.from(qrPinInputs).map(input => input.value).join('');
+            
+            if (pin.length !== 6) {
+                document.getElementById('qr-error').textContent = 'Please enter all 6 digits';
+                document.getElementById('qr-error').classList.remove('hidden');
+                return;
+            }
+            
+            processQRRegistration(currentQRData, email, pin);
+        });
+
+        function showQRSetupForm(qrData) {
+            try {
+                const qrParsed = JSON.parse(qrData);
+                currentQRData = qrData;
+                document.getElementById('qr-scanner-area').classList.add('hidden');
+                document.getElementById('qr-setup-form').classList.remove('hidden');
+                document.getElementById('qr-badge-name').textContent = `Badge: ${qrParsed.name || 'Laracon Attendee'}`;
+                document.getElementById('qr-email').focus();
+            } catch (e) {
+                console.error('Error parsing QR data:', e);
+            }
+        }
+
+        function cancelQRSetup() {
+            document.getElementById('qr-setup-form').classList.add('hidden');
+            document.getElementById('qr-scanner-area').classList.remove('hidden');
+            qrPinInputs.forEach(input => input.value = '');
+            document.getElementById('qr-email').value = '';
+            document.getElementById('qr-error').classList.add('hidden');
+            currentQRData = null;
+            if (!scanning) startQRScanner();
+        }
 
         // QR Code Scanner
         const video = document.getElementById('qr-video');
@@ -249,6 +352,13 @@
                 resultDiv.textContent = '📷 Camera ready - Point at Laracon badge';
             } catch (err) {
                 resultDiv.textContent = '⚠️ Camera access denied';
+                if (window.logApiRequest) {
+                    logApiRequest({
+                        type: 'Camera Error',
+                        error: err.message || err.toString(),
+                        success: false
+                    });
+                }
                 console.error('Camera error:', err);
             }
         }
@@ -274,49 +384,98 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    resultDiv.textContent = '✅ QR detected! Creating account...';
-                    processQRRegister(code.data);
+                    resultDiv.textContent = '✅ QR detected! Setup your account...';
+                    scanning = false;
+                    stopQRScanner();
+                    showQRSetupForm(code.data);
                     return;
                 }
             }
             requestAnimationFrame(scanQRCode);
         }
 
-        function processQRRegister(qrData) {
-            scanning = false;
+        function processQRRegistration(qrData, email, pin) {
+            const startTime = Date.now();
+            
+            if (window.logApiRequest) {
+                logApiRequest({
+                    type: 'QR Register Request',
+                    url: '{{ route('register') }}',
+                    method: 'POST',
+                    params: { qr_code: qrData, email: email, pin: pin }
+                });
+            }
             
             fetch('{{ route('register') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     qr_code: qrData,
+                    email: email,
+                    pin: pin,
                     laracon_register: true
                 })
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(response => {
+                const duration = Date.now() - startTime;
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw { status: response.status, data };
+                    });
+                }
+                return response.json().then(data => ({
+                    data,
+                    status: response.status,
+                    duration
+                }));
+            })
+            .then(({ data, status, duration }) => {
                 if (data.success) {
-                    resultDiv.textContent = '✅ Registration successful! Redirecting...';
+                    document.getElementById('qr-result').textContent = '✅ Registration successful! Redirecting...';
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR Register Success',
+                            response: data,
+                            statusCode: status,
+                            success: true,
+                            duration
+                        });
+                    }
                     window.location.href = data.redirect || '{{ route('dashboard') }}';
                 } else {
-                    resultDiv.textContent = '❌ Invalid or used QR code';
-                    scanning = true;
-                    requestAnimationFrame(scanQRCode);
+                    document.getElementById('qr-error').textContent = data.message || 'Registration failed';
+                    document.getElementById('qr-error').classList.remove('hidden');
+                    if (window.logApiRequest) {
+                        logApiRequest({
+                            type: 'QR Register Failed',
+                            response: data,
+                            statusCode: status,
+                            success: false,
+                            duration
+                        });
+                    }
                 }
             })
             .catch(error => {
-                resultDiv.textContent = '❌ Error processing QR';
+                const duration = Date.now() - startTime;
+                const errorMessage = error.data?.message || 'Error processing registration';
+                document.getElementById('qr-error').textContent = errorMessage;
+                document.getElementById('qr-error').classList.remove('hidden');
+                if (window.logApiRequest) {
+                    logApiRequest({
+                        type: 'QR Register Error',
+                        error: errorMessage,
+                        success: false,
+                        duration
+                    });
+                }
                 console.error('QR register error:', error);
-                scanning = true;
-                requestAnimationFrame(scanQRCode);
             });
         }
-
-        // Auto-start QR scanner
-        startQRScanner();
     </script>
 </body>
 </html>
