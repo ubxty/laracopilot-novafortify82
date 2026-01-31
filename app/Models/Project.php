@@ -2,36 +2,55 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Project extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'user_id',
         'name',
-        'description',
-        'repository_url',
+        'slug',
+        'short_description',
+        'full_description',
+        'project_type',
+        'github_url',
         'demo_url',
+        'documentation_url',
+        'stars',
+        'forks',
         'tags',
+        'is_featured',
         'is_published'
     ];
 
     protected $casts = [
+        'tags' => 'array',
+        'is_featured' => 'boolean',
         'is_published' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'stars' => 'integer',
+        'forks' => 'integer'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($project) {
+            if (empty($project->slug)) {
+                $project->slug = Str::slug($project->name);
+            }
+        });
+
+        static::updating(function ($project) {
+            if ($project->isDirty('name')) {
+                $project->slug = Str::slug($project->name);
+            }
+        });
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function getTagsArrayAttribute()
-    {
-        return $this->tags ? explode(',', $this->tags) : [];
     }
 }

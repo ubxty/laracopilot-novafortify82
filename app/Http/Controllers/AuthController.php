@@ -4,139 +4,106 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function showLogin()
-    {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-        
-        return view('auth.login');
-    }
-
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials do not match our records.'],
-            ]);
-        }
-
-        // Check if user was registered via QR code (has uuid but password might not be set yet)
-        if ($user->uuid && !$user->password) {
-            throw ValidationException::withMessages([
-                'email' => ['Please set your password first. Check your email for instructions.'],
-            ]);
-        }
-
-        // Attempt authentication with email and password
-        if (!Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials do not match our records.'],
-            ]);
-        }
-
-        // Log the user in
-        Auth::login($user, $request->boolean('remember'));
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard'));
-    }
-
     public function showRegister()
     {
-        if (Auth::check()) {
-            return redirect()->route('dashboard');
-        }
-        
         return view('auth.register');
     }
 
     public function register(Request $request)
     {
+        // Validate request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'pin' => 'required|digits:6',
+            'laracon_uuid' => 'nullable|string|unique:users,laracon_uuid'
         ]);
 
+        // Create user
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make('default_password_' . time()),
+            'pin' => Hash::make($validated['pin']),
+            'laracon_uuid' => $validated['laracon_uuid'] ?? null
         ]);
 
+        // Log the user in
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('success', 'Welcome to Laravel Community! 🎉');
+    }
+
+    public function showLogin()
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('dashboard'));
+        }
+
+        return back()->withErrors([
+            'email' => 'The provided credentials do not match our records.'
+        ])->onlyInput('email');
+    }
+
+    public function checkQR(Request $request)
+    {
+        $request->validate([
+            'laracon_uuid' => 'required|string'
+        ]);
+
+        $user = User::where('laracon_uuid', $request->laracon_uuid)->first();
+
+        return response()->json([
+            'exists' => $user !== null,
+            'name' => $user ? $user->name : null
+        ]);
+    }
+
+    public function loginWithQR(Request $request)
+    {
+        $request->validate([
+            'laracon_uuid' => 'required|string',
+            'pin' => 'required|digits:6'
+        ]);
+
+        $user = User::where('laracon_uuid', $request->laracon_uuid)->first();
+
+        if (!$user) {
+            return back()->withErrors(['pin' => 'User not found']);
+        }
+
+        if (!Hash::check($request->pin, $user->pin)) {
+            return back()->withErrors(['pin' => 'Invalid PIN']);
+        }
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('dashboard')->with('success', 'Welcome back, ' . $user->name . '! 👋');
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
-        return redirect()->route('login');
-    }
-
-    public function showQrLogin($uuid)
-    {
-        $user = User::where('uuid', $uuid)->first();
-
-        if (!$user) {
-            abort(404, 'Invalid QR code');
-        }
-
-        // Auto-login user who scanned QR code
-        Auth::login($user);
-
-        return redirect()->route('dashboard')->with('success', 'Welcome back, ' . $user->name . '!');
-    }
-
-    public function showSetPassword($uuid)
-    {
-        $user = User::where('uuid', $uuid)->first();
-
-        if (!$user) {
-            abort(404, 'Invalid link');
-        }
-
-        return view('auth.set-password', compact('user'));
-    }
-
-    public function setPassword(Request $request, $uuid)
-    {
-        $user = User::where('uuid', $uuid)->first();
-
-        if (!$user) {
-            abort(404, 'Invalid link');
-        }
-
-        $request->validate([
-            'password' => 'required|string|min:8|confirmed',
-        ]);
-
-        $user->update([
-            'password' => Hash::make($request->password),
-        ]);
-
-        Auth::login($user);
-
-        return redirect()->route('dashboard')->with('success', 'Password set successfully!');
+        
+        return redirect()->route('home');
     }
 }

@@ -12,44 +12,28 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
-        'full_name',
         'email',
         'password',
-        'github_id',
-        'github_token',
-        'github_refresh_token',
-        'qr_code',
         'laracon_uuid',
-        'role'
+        'pin'
     ];
 
     protected $hidden = [
         'password',
+        'pin',
         'remember_token',
-        'github_token',
-        'github_refresh_token'
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'role' => 'string'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
-    // Relationships
     public function projects()
     {
         return $this->hasMany(Project::class);
-    }
-
-    // Helper methods
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
-
-    public function isUser()
-    {
-        return $this->role === 'user';
     }
 }

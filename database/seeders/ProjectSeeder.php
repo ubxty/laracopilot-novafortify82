@@ -10,159 +10,133 @@ class ProjectSeeder extends Seeder
 {
     public function run()
     {
-        $users = User::where('role', 'user')->get();
+        $user = User::first();
+        
+        if (!$user) {
+            $user = User::create([
+                'name' => 'Demo User',
+                'email' => 'demo@laravel.com',
+                'password' => bcrypt('password')
+            ]);
+        }
 
         $projects = [
             [
-                'name' => 'Laravel E-commerce Platform',
-                'description' => 'Full-featured e-commerce platform built with Laravel 11, featuring product management, shopping cart, payment integration, and order tracking.',
-                'github_url' => 'https://github.com/ravdeep/laravel-ecommerce',
-                'demo_url' => 'https://demo.laravel-ecommerce.test',
-                'tags' => json_encode(['Laravel', 'E-commerce', 'Stripe', 'Vue.js']),
-                'stars' => 324,
-                'forks' => 87,
-                'active' => true
+                'name' => 'Laravel Breeze',
+                'short_description' => 'Minimal, simple authentication scaffolding with Blade and Tailwind',
+                'full_description' => 'Laravel Breeze provides a minimal, simple implementation of all of Laravel authentication features, including login, registration, password reset, email verification, and password confirmation.',
+                'project_type' => 'Starter Kit',
+                'github_url' => 'https://github.com/laravel/breeze',
+                'demo_url' => 'https://laravel.com/docs/starter-kits',
+                'stars' => 2800,
+                'forks' => 450,
+                'tags' => ['authentication', 'starter-kit', 'tailwind']
             ],
             [
-                'name' => 'SaaS Starter Kit',
-                'description' => 'Production-ready SaaS boilerplate with multi-tenancy, subscription billing, team management, and admin dashboard.',
-                'github_url' => 'https://github.com/ravdeep/saas-starter',
-                'demo_url' => 'https://saas-demo.test',
-                'tags' => json_encode(['SaaS', 'Multi-tenancy', 'Billing', 'Teams']),
-                'stars' => 512,
-                'forks' => 143,
-                'active' => true
+                'name' => 'Livewire',
+                'short_description' => 'A full-stack framework for Laravel that makes building dynamic interfaces simple',
+                'full_description' => 'Livewire is a full-stack framework for Laravel that makes building dynamic interfaces simple, without leaving the comfort of Laravel.',
+                'project_type' => 'Framework',
+                'github_url' => 'https://github.com/livewire/livewire',
+                'demo_url' => 'https://livewire.laravel.com',
+                'stars' => 21500,
+                'forks' => 1300,
+                'tags' => ['frontend', 'reactive', 'components']
             ],
             [
-                'name' => 'API Gateway',
-                'description' => 'Microservices API gateway with rate limiting, authentication, request transformation, and monitoring built on Laravel.',
-                'github_url' => 'https://github.com/ravdeep/api-gateway',
-                'tags' => json_encode(['API', 'Microservices', 'Gateway', 'Laravel']),
-                'stars' => 267,
-                'forks' => 54,
-                'active' => true
+                'name' => 'Laravel Sanctum',
+                'short_description' => 'API token authentication for Laravel and simple SPA authentication',
+                'full_description' => 'Laravel Sanctum provides a featherweight authentication system for SPAs and simple APIs.',
+                'project_type' => 'Package',
+                'github_url' => 'https://github.com/laravel/sanctum',
+                'documentation_url' => 'https://laravel.com/docs/sanctum',
+                'stars' => 2600,
+                'forks' => 280,
+                'tags' => ['authentication', 'api', 'spa']
             ],
             [
-                'name' => 'Real-time Chat Application',
-                'description' => 'WebSocket-based real-time chat with private messaging, group chats, file sharing, and emoji reactions.',
-                'github_url' => 'https://github.com/john/realtime-chat',
-                'demo_url' => 'https://chat-demo.test',
-                'tags' => json_encode(['WebSocket', 'Chat', 'Real-time', 'Pusher']),
-                'stars' => 189,
-                'forks' => 42,
-                'active' => true
+                'name' => 'Laravel Telescope',
+                'short_description' => 'An elegant debug assistant for Laravel applications',
+                'full_description' => 'Laravel Telescope makes a wonderful companion to your local Laravel development environment. Telescope provides insight into the requests coming into your application, exceptions, log entries, database queries, queued jobs, mail, notifications, cache operations, scheduled tasks, variable dumps and more.',
+                'project_type' => 'Tool',
+                'github_url' => 'https://github.com/laravel/telescope',
+                'documentation_url' => 'https://laravel.com/docs/telescope',
+                'stars' => 4700,
+                'forks' => 580,
+                'tags' => ['debugging', 'development', 'monitoring']
             ],
             [
-                'name' => 'Task Management System',
-                'description' => 'Kanban-style task manager with drag-and-drop, time tracking, team collaboration, and project analytics.',
-                'github_url' => 'https://github.com/sarah/task-manager',
-                'demo_url' => 'https://tasks.test',
-                'tags' => json_encode(['Task Management', 'Kanban', 'Teams', 'Analytics']),
-                'stars' => 421,
-                'forks' => 98,
-                'active' => true
+                'name' => 'Filament',
+                'short_description' => 'A collection of beautiful full-stack components for Laravel',
+                'full_description' => 'Filament is a collection of beautiful full-stack components. The perfect starting point for your next app. Using Livewire, Alpine.js and Tailwind CSS.',
+                'project_type' => 'Framework',
+                'github_url' => 'https://github.com/filamentphp/filament',
+                'demo_url' => 'https://filamentphp.com',
+                'stars' => 14200,
+                'forks' => 2100,
+                'tags' => ['admin-panel', 'livewire', 'tailwind']
             ],
             [
-                'name' => 'Blog CMS',
-                'description' => 'Modern content management system with markdown support, media library, SEO optimization, and multi-author support.',
-                'github_url' => 'https://github.com/john/blog-cms',
-                'tags' => json_encode(['CMS', 'Blog', 'Markdown', 'SEO']),
-                'stars' => 156,
-                'forks' => 33,
-                'active' => true
+                'name' => 'Laravel Horizon',
+                'short_description' => 'Dashboard and configuration system for Laravel queues',
+                'full_description' => 'Horizon provides a beautiful dashboard and code-driven configuration for your Laravel powered Redis queues. Horizon allows you to easily monitor key metrics of your queue system.',
+                'project_type' => 'Tool',
+                'github_url' => 'https://github.com/laravel/horizon',
+                'documentation_url' => 'https://laravel.com/docs/horizon',
+                'stars' => 3800,
+                'forks' => 650,
+                'tags' => ['queue', 'redis', 'monitoring']
             ],
             [
-                'name' => 'Inventory Management',
-                'description' => 'Complete inventory tracking system with barcode scanning, stock alerts, supplier management, and reporting.',
-                'github_url' => 'https://github.com/sarah/inventory-system',
-                'demo_url' => 'https://inventory.test',
-                'tags' => json_encode(['Inventory', 'Barcode', 'Stock', 'Reports']),
-                'stars' => 234,
-                'forks' => 67,
-                'active' => true
+                'name' => 'Spatie Laravel Permission',
+                'short_description' => 'Associate users with roles and permissions',
+                'full_description' => 'This package allows you to manage user permissions and roles in a database. Once installed you can do stuff like this: $user->assignRole("writer"); $user->givePermissionTo("edit articles");',
+                'project_type' => 'Package',
+                'github_url' => 'https://github.com/spatie/laravel-permission',
+                'documentation_url' => 'https://spatie.be/docs/laravel-permission',
+                'stars' => 11800,
+                'forks' => 1700,
+                'tags' => ['authorization', 'permissions', 'roles']
             ],
             [
-                'name' => 'Learning Management System',
-                'description' => 'Full LMS with course creation, video lessons, quizzes, certificates, and student progress tracking.',
-                'github_url' => 'https://github.com/ravdeep/lms-platform',
-                'demo_url' => 'https://learn.test',
-                'tags' => json_encode(['LMS', 'Education', 'Courses', 'Certificates']),
-                'stars' => 678,
-                'forks' => 234,
-                'active' => true
+                'name' => 'Laravel Jetstream',
+                'short_description' => 'Beautifully designed application scaffolding for Laravel',
+                'full_description' => 'Laravel Jetstream is a beautifully designed application scaffolding for Laravel. Jetstream provides the perfect starting point for your next Laravel application and includes login, registration, email verification, two-factor authentication, session management, API support via Laravel Sanctum, and optional team management.',
+                'project_type' => 'Starter Kit',
+                'github_url' => 'https://github.com/laravel/jetstream',
+                'documentation_url' => 'https://jetstream.laravel.com',
+                'stars' => 3900,
+                'forks' => 780,
+                'tags' => ['starter-kit', 'authentication', 'teams']
             ],
             [
-                'name' => 'Restaurant POS',
-                'description' => 'Point of sale system for restaurants with table management, kitchen display, online ordering, and reporting.',
-                'github_url' => 'https://github.com/john/restaurant-pos',
-                'tags' => json_encode(['POS', 'Restaurant', 'Orders', 'Kitchen']),
-                'stars' => 145,
-                'forks' => 38,
-                'active' => true
+                'name' => 'Laravel Debugbar',
+                'short_description' => 'PHP Debugbar integration for Laravel',
+                'full_description' => 'This is a package to integrate PHP Debug Bar with Laravel. It includes a ServiceProvider to register the debugbar and attach it to the output. You can publish assets and configure it through Laravel.',
+                'project_type' => 'Tool',
+                'github_url' => 'https://github.com/barryvdh/laravel-debugbar',
+                'stars' => 16200,
+                'forks' => 1500,
+                'tags' => ['debugging', 'development', 'profiling']
             ],
             [
-                'name' => 'Event Management Platform',
-                'description' => 'Complete event platform with ticketing, QR code check-in, attendee management, and analytics.',
-                'github_url' => 'https://github.com/sarah/event-platform',
-                'demo_url' => 'https://events.test',
-                'tags' => json_encode(['Events', 'Ticketing', 'QR Code', 'Analytics']),
-                'stars' => 289,
-                'forks' => 72,
-                'active' => true
-            ],
-            [
-                'name' => 'HR Management System',
-                'description' => 'Employee management with attendance tracking, leave management, payroll, and performance reviews.',
-                'github_url' => 'https://github.com/ravdeep/hr-system',
-                'tags' => json_encode(['HR', 'Payroll', 'Attendance', 'Performance']),
-                'stars' => 198,
-                'forks' => 45,
-                'active' => true
-            ],
-            [
-                'name' => 'Social Media Dashboard',
-                'description' => 'Multi-platform social media management tool with post scheduling, analytics, and engagement tracking.',
-                'github_url' => 'https://github.com/john/social-dashboard',
-                'demo_url' => 'https://social.test',
-                'tags' => json_encode(['Social Media', 'Analytics', 'Scheduling', 'API']),
-                'stars' => 367,
-                'forks' => 89,
-                'active' => true
-            ],
-            [
-                'name' => 'CRM System',
-                'description' => 'Customer relationship management with lead tracking, pipeline management, email integration, and reporting.',
-                'github_url' => 'https://github.com/sarah/crm-system',
-                'tags' => json_encode(['CRM', 'Sales', 'Pipeline', 'Leads']),
-                'stars' => 445,
-                'forks' => 123,
-                'active' => true
-            ],
-            [
-                'name' => 'Booking System',
-                'description' => 'Appointment and reservation system with calendar integration, notifications, and payment processing.',
-                'github_url' => 'https://github.com/ravdeep/booking-system',
-                'demo_url' => 'https://book.test',
-                'tags' => json_encode(['Booking', 'Calendar', 'Appointments', 'Payments']),
-                'stars' => 312,
-                'forks' => 78,
-                'active' => true
-            ],
-            [
-                'name' => 'Analytics Dashboard',
-                'description' => 'Business intelligence dashboard with real-time metrics, custom reports, and data visualization.',
-                'github_url' => 'https://github.com/john/analytics-dashboard',
-                'demo_url' => 'https://analytics.test',
-                'tags' => json_encode(['Analytics', 'BI', 'Reports', 'Charts']),
-                'stars' => 523,
-                'forks' => 156,
-                'active' => true
+                'name' => 'Laravel Excel',
+                'short_description' => 'Supercharged Excel exports and imports',
+                'full_description' => 'Laravel Excel is intended at being Laravel-flavoured PhpSpreadsheet: a simple, but elegant wrapper around PhpSpreadsheet with the goal of simplifying exports and imports.',
+                'project_type' => 'Package',
+                'github_url' => 'https://github.com/SpartnerNL/Laravel-Excel',
+                'documentation_url' => 'https://docs.laravel-excel.com',
+                'stars' => 12000,
+                'forks' => 1800,
+                'tags' => ['excel', 'import', 'export']
             ]
         ];
 
-        foreach ($projects as $projectData) {
-            Project::create(array_merge($projectData, [
-                'user_id' => $users->random()->id
+        foreach ($projects as $project) {
+            Project::create(array_merge($project, [
+                'user_id' => $user->id,
+                'is_featured' => rand(0, 1) === 1,
+                'is_published' => true
             ]));
         }
     }
