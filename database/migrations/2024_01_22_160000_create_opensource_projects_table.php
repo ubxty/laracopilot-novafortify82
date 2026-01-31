@@ -8,8 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('opensource_projects', function (Blueprint $table) {
-            $table->id();
+        /*Schema::create('opensource_projects', function (Blueprint $table) {
+         /*   $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('short_description', 300);
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('featured')->default(false);
             $table->boolean('active')->default(false);
             $table->timestamps();
-        });
+        });*/
     }
 
     public function down(): void
