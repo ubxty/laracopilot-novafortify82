@@ -13,10 +13,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->text('description');
-            $table->string('repository_url');
+            $table->string('github_url');
             $table->string('demo_url')->nullable();
-            $table->string('tags')->nullable();
-            $table->boolean('is_published')->default(false);
+            $table->string('image_url')->nullable();
+            $table->json('tags')->nullable();
+            $table->integer('stars')->default(0);
+            $table->integer('forks')->default(0);
+            $table->boolean('active')->default(true);
             $table->timestamps();
         });
     }
