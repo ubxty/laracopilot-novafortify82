@@ -1,59 +1,232 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Projects - Laravel Community</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-red-600 to-black text-white shadow-lg">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                    </svg>
+                    <h1 class="text-xl md:text-2xl font-bold">Laravel Community</h1>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg hover:bg-white/10 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="{{ route('home') }}" class="hover:text-red-200 transition-colors font-medium">Home</a>
+                    <a href="{{ route('projects.public') }}" class="hover:text-red-200 transition-colors font-medium">Projects</a>
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="hover:text-red-200 transition-colors font-medium">Dashboard</a>
+                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="hover:text-red-200 transition-colors font-medium">Logout</button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="hover:text-red-200 transition-colors font-medium">Login</a>
+                        <a href="{{ route('register') }}" class="bg-white text-red-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium">Register</a>
+                    @endauth
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="hidden md:hidden mt-4 pb-4 space-y-3">
+                <a href="{{ route('home') }}" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors font-medium">Home</a>
+                <a href="{{ route('projects.public') }}" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors font-medium">Projects</a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors font-medium">Dashboard</a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="w-full text-left px-4 py-2 rounded-lg hover:bg-white/10 transition-colors font-medium">Logout</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="block px-4 py-2 rounded-lg hover:bg-white/10 transition-colors font-medium">Login</a>
+                    <a href="{{ route('register') }}" class="block px-4 py-2 bg-white text-red-600 rounded-lg hover:bg-gray-100 transition-colors font-medium text-center">Register</a>
+                @endauth
+            </div>
+        </nav>
+    </header>
 
-@section('title', 'Browse Projects - Laravel Community')
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-red-600 to-black text-white py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Browse Projects</h2>
+            <p class="text-xl text-red-100">Discover amazing open source Laravel projects</p>
+        </div>
+    </section>
 
-@section('content')
-<div class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-4xl font-bold mb-4">Community Projects</h1>
-        <p class="text-lg text-gray-300">Discover amazing open-source Laravel projects from developers worldwide</p>
-    </div>
-</div>
+    <!-- Filters -->
+    <section class="bg-white shadow-sm py-6">
+        <div class="container mx-auto px-4">
+            <form action="{{ route('projects.public') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search projects..." 
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                
+                <select name="type" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="">All Types</option>
+                    <option value="Package" {{ request('type') == 'Package' ? 'selected' : '' }}>Package</option>
+                    <option value="Framework" {{ request('type') == 'Framework' ? 'selected' : '' }}>Framework</option>
+                    <option value="Starter Kit" {{ request('type') == 'Starter Kit' ? 'selected' : '' }}>Starter Kit</option>
+                </select>
+                
+                <select name="sort" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="latest" {{ request('sort') == 'latest' ? 'selected' : '' }}>Latest</option>
+                    <option value="stars" {{ request('sort') == 'stars' ? 'selected' : '' }}>Most Stars</option>
+                    <option value="forks" {{ request('sort') == 'forks' ? 'selected' : '' }}>Most Forks</option>
+                </select>
+                
+                <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    Apply Filters
+                </button>
+            </form>
+        </div>
+    </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    @if($projects->count() > 0)
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($projects as $project)
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">
-                        <a href="{{ route('projects.show', $project->id) }}" class="hover:text-red-600 transition-colors">{{ $project->name }}</a>
-                    </h3>
-                    <p class="text-gray-600 text-sm mb-4">{{ Str::limit($project->description, 120) }}</p>
-                    
-                    @if($project->tags)
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        @foreach(explode(',', $project->tags) as $tag)
-                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{{ trim($tag) }}</span>
-                        @endforeach
-                    </div>
-                    @endif
-
-                    <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div class="flex items-center text-sm text-gray-500">
-                            <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2">
-                                {{ substr($project->user->name, 0, 1) }}
+    <!-- Projects Grid -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            @if($projects->isEmpty())
+                <div class="text-center py-12">
+                    <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h3 class="text-2xl font-bold text-gray-700 mb-2">No projects found</h3>
+                    <p class="text-gray-500">Try adjusting your filters or search terms</p>
+                </div>
+            @else
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($projects as $project)
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                        <div class="p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <h3 class="text-xl font-bold text-gray-800">{{ $project->name }}</h3>
+                                <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">{{ $project->project_type }}</span>
                             </div>
-                            <span>{{ $project->user->name }}</span>
+                            <p class="text-gray-600 mb-4 line-clamp-3">{{ $project->short_description }}</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                @if($project->tags)
+                                    @foreach(json_decode($project->tags) as $tag)
+                                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{{ $tag }}</span>
+                                    @endforeach
+                                @endif
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                <div class="flex items-center space-x-4">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                        {{ number_format($project->stars) }}
+                                    </span>
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ number_format($project->forks) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="{{ $project->github_url }}" target="_blank" class="flex-1 bg-gray-800 text-white text-center px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors font-medium">
+                                    <svg class="w-5 h-5 inline mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                    GitHub
+                                </a>
+                                @if($project->demo_url)
+                                <a href="{{ $project->demo_url }}" target="_blank" class="flex-1 bg-red-600 text-white text-center px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium">Demo</a>
+                                @endif
+                            </div>
                         </div>
-                        <a href="{{ route('projects.show', $project->id) }}" class="text-red-600 hover:text-red-700 font-semibold text-sm">
-                            View →
-                        </a>
+                    </div>
+                    @endforeach
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-12">
+                    {{ $projects->links() }}
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Laravel Community</h4>
+                    <p class="text-gray-400">Discover and share amazing open source Laravel projects built by developers worldwide.</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="{{ route('home') }}" class="hover:text-white transition-colors">Home</a></li>
+                        <li><a href="{{ route('projects.public') }}" class="hover:text-white transition-colors">Browse Projects</a></li>
+                        <li><a href="{{ route('register') }}" class="hover:text-white transition-colors">Submit Project</a></li>
+                        <li><a href="{{ route('login') }}" class="hover:text-white transition-colors">Login</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://laravel.com/docs" target="_blank" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="https://github.com/laravel" target="_blank" class="hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="https://laracasts.com" target="_blank" class="hover:text-white transition-colors">Laracasts</a></li>
+                        <li><a href="https://laravel-news.com" target="_blank" class="hover:text-white transition-colors">Laravel News</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-bold mb-4">Community</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://twitter.com/laravelphp" target="_blank" class="hover:text-white transition-colors">Twitter</a></li>
+                        <li><a href="https://discord.gg/laravel" target="_blank" class="hover:text-white transition-colors">Discord</a></li>
+                        <li><a href="https://laracasts.com/discuss" target="_blank" class="hover:text-white transition-colors">Forum</a></li>
+                        <li><a href="https://github.com/laravel/framework/discussions" target="_blank" class="hover:text-white transition-colors">Discussions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p class="text-gray-400 text-sm text-center md:text-left">© {{ date('Y') }} Laravel Community Platform. All rights reserved.</p>
+                    <div class="flex items-center gap-6">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400 text-sm">Built with</span>
+                            <a href="https://laracopilot.com/" target="_blank" class="hover:opacity-80 transition-opacity">
+                                <img src="https://laracopilot.com/wp-content/uploads/2025/09/white-logo.svg" alt="LaraCopilot" class="h-6">
+                            </a>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-gray-400 text-sm">Deployed with</span>
+                            <a href="https://cloudpanzer.com/" target="_blank" class="hover:opacity-80 transition-opacity">
+                                <img src="https://cloudpanzer.com/assets/logo/logo_dark.webp" alt="CloudPanzer" class="h-6">
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
+    </footer>
 
-        <div class="mt-8">
-            {{ $projects->links() }}
-        </div>
-    @else
-        <div class="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div class="text-6xl mb-4">🔍</div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">No Projects Found</h3>
-            <p class="text-gray-600">Be the first to share a project with the community!</p>
-        </div>
-    @endif
-</div>
-@endsection
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>
