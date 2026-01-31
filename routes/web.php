@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OpensourceProjectController;
+use App\Http\Controllers\DashboardController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -18,6 +19,11 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// User Dashboard
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::post('/dashboard/project', [DashboardController::class, 'storeProject'])->name('dashboard.project.store');
+Route::delete('/dashboard/project/{id}', [DashboardController::class, 'deleteProject'])->name('dashboard.project.delete');
 
 // Admin Authentication
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');

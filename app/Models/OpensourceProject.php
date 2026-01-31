@@ -14,11 +14,13 @@ class OpensourceProject extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'short_description',
         'description',
         'github_url',
         'demo_url',
         'image_url',
         'tags',
+        'project_type',
         'stars',
         'forks',
         'featured',
