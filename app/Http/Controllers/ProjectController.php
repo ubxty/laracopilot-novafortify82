@@ -4,114 +4,117 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function publicIndex()
     {
-        $projects = Project::where('user_id', Auth::id())
+        $projects = Project::where('is_public', true)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
+        
+        return view('projects.public', compact('projects'));
+    }
 
-        return view('dashboard.projects.index', compact('projects'));
+    public function index()
+    {
+        if (!session('user_id')) {
+            return redirect()->route('login');
+        }
+
+        $projects = Project::where('user_id', session('user_id'))
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+        
+        return view('projects.index', compact('projects'));
     }
 
     public function create()
     {
-        return view('dashboard.projects.create');
+        if (!session('user_id')) {
+            return redirect()->route('login');
+        }
+
+        return view('projects.create');
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'short_description' => 'required|string|max:500',
-            'full_description' => 'nullable|string',
-            'project_type' => 'required|in:Package,Framework,Starter Kit,Tool,Application',
-            'github_url' => 'required|url',
-            'demo_url' => 'nullable|url',
-            'documentation_url' => 'nullable|url',
-            'stars' => 'nullable|integer|min:0',
-            'forks' => 'nullable|integer|min:0',
-            'tags' => 'nullable|string',
-            'is_published' => 'boolean'
-        ]);
-
-        // Convert tags string to array
-        if (!empty($validated['tags'])) {
-            $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
-        } else {
-            $validated['tags'] = [];
+        if (!session('user_id')) {
+            return redirect()->route('login');
         }
 
-        // Set defaults
-        $validated['user_id'] = Auth::id();
-        $validated['stars'] = $validated['stars'] ?? 0;
-        $validated['forks'] = $validated['forks'] ?? 0;
-        $validated['is_published'] = $request->has('is_published');
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'tech_stack' => 'required|string',
+            'project_url' => 'nullable|url',
+            'github_url' => 'nullable|url',
+            'is_public' => 'boolean'
+        ]);
+
+        $validated['user_id'] = session('user_id');
+        $validated['is_public'] = $request->has('is_public');
 
         Project::create($validated);
 
-        return redirect()->route('dashboard.projects.index')
-            ->with('success', 'Project created successfully! 🎉');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project created successfully!');
     }
 
     public function edit($id)
     {
-        $project = Project::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        if (!session('user_id')) {
+            return redirect()->route('login');
+        }
 
-        return view('dashboard.projects.edit', compact('project'));
+        $project = Project::where('id', $id)
+            ->where('user_id', session('user_id'))
+            ->firstOrFail();
+        
+        return view('projects.edit', compact('project'));
     }
 
     public function update(Request $request, $id)
     {
-        $project = Project::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'short_description' => 'required|string|max:500',
-            'full_description' => 'nullable|string',
-            'project_type' => 'required|in:Package,Framework,Starter Kit,Tool,Application',
-            'github_url' => 'required|url',
-            'demo_url' => 'nullable|url',
-            'documentation_url' => 'nullable|url',
-            'stars' => 'nullable|integer|min:0',
-            'forks' => 'nullable|integer|min:0',
-            'tags' => 'nullable|string',
-            'is_published' => 'boolean'
-        ]);
-
-        // Convert tags string to array
-        if (!empty($validated['tags'])) {
-            $validated['tags'] = array_map('trim', explode(',', $validated['tags']));
-        } else {
-            $validated['tags'] = [];
+        if (!session('user_id')) {
+            return redirect()->route('login');
         }
 
-        $validated['stars'] = $validated['stars'] ?? 0;
-        $validated['forks'] = $validated['forks'] ?? 0;
-        $validated['is_published'] = $request->has('is_published');
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'tech_stack' => 'required|string',
+            'project_url' => 'nullable|url',
+            'github_url' => 'nullable|url',
+            'is_public' => 'boolean'
+        ]);
 
+        $validated['is_public'] = $request->has('is_public');
+
+        $project = Project::where('id', $id)
+            ->where('user_id', session('user_id'))
+            ->firstOrFail();
+        
         $project->update($validated);
 
-        return redirect()->route('dashboard.projects.index')
-            ->with('success', 'Project updated successfully! ✅');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project updated successfully!');
     }
 
     public function destroy($id)
     {
-        $project = Project::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
+        if (!session('user_id')) {
+            return redirect()->route('login');
+        }
 
+        $project = Project::where('id', $id)
+            ->where('user_id', session('user_id'))
+            ->firstOrFail();
+        
         $project->delete();
 
-        return redirect()->route('dashboard.projects.index')
+        return redirect()->route('projects.index')
             ->with('success', 'Project deleted successfully!');
     }
 }

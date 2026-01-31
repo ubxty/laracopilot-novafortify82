@@ -22,6 +22,17 @@ class ArtisanController extends Controller
         return view('artisan.index', compact('logs'));
     }
 
+    public function showAuthenticate()
+    {
+        // If already authenticated, redirect to index
+        if (session('artisan_access')) {
+            return redirect()->route('artisan.index');
+        }
+        
+        // Otherwise show login page
+        return view('artisan.login');
+    }
+
     public function authenticate(Request $request)
     {
         $request->validate([

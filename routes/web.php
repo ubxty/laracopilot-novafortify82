@@ -19,10 +19,19 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Protected routes
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Public project listing
+Route::get('/projects/public', [ProjectController::class, 'publicIndex'])->name('projects.public');
 
-// Projects routes
+// Protected routes - Dashboard
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard/projects', [ProjectController::class, 'index'])->name('dashboard.projects.index');
+Route::get('/dashboard/projects/create', [ProjectController::class, 'create'])->name('dashboard.projects.create');
+Route::post('/dashboard/projects', [ProjectController::class, 'store'])->name('dashboard.projects.store');
+Route::get('/dashboard/projects/{id}/edit', [ProjectController::class, 'edit'])->name('dashboard.projects.edit');
+Route::put('/dashboard/projects/{id}', [ProjectController::class, 'update'])->name('dashboard.projects.update');
+Route::delete('/dashboard/projects/{id}', [ProjectController::class, 'destroy'])->name('dashboard.projects.destroy');
+
+// Projects routes (user's own projects - alternative paths)
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/create', [ProjectController::class, 'create'])->name('projects.create');
 Route::post('/projects', [ProjectController::class, 'store'])->name('projects.store');
@@ -52,6 +61,7 @@ Route::post('/debug-logs/clear', [DebugLogController::class, 'clear'])->name('de
 
 // Artisan command runner (guest accessible with passcode)
 Route::get('/artisan', [ArtisanController::class, 'index'])->name('artisan.index');
+Route::get('/artisan/authenticate', [ArtisanController::class, 'showAuthenticate'])->name('artisan.authenticate.show');
 Route::post('/artisan/authenticate', [ArtisanController::class, 'authenticate'])->name('artisan.authenticate');
 Route::post('/artisan/run', [ArtisanController::class, 'run'])->name('artisan.run');
 Route::get('/artisan/refresh', [ArtisanController::class, 'refresh'])->name('artisan.refresh');
