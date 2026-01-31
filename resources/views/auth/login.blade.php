@@ -5,114 +5,283 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Laravel Community</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-gradient-to-br from-red-500 via-pink-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full">
-        <!-- Error Messages -->
-        @if($errors->any())
-            <div class="mb-4 bg-red-600 text-white p-4 rounded-lg shadow-lg">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold">Login Failed</p>
-                        <ul class="text-sm mt-1 space-y-1">
-                            @foreach($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
+<body class="bg-gray-50">
+    @include('partials.header')
+
+    <!-- Login Section -->
+    <section class="py-12 md:py-16 bg-gray-50 min-h-screen flex items-center">
+        <div class="container mx-auto px-4">
+            <div class="max-w-md mx-auto">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <!-- Header -->
+                    <div class="bg-gradient-to-r from-red-600 to-black text-white p-6 md:p-8 text-center">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Welcome Back</h2>
+                        <p class="text-red-100 text-sm md:text-base">Login to access your Laravel Community account</p>
+                    </div>
+
+                    <div class="p-6 md:p-8">
+                        @if(session('error'))
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        @if(session('success'))
+                            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 text-sm">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        <!-- Login Method Toggle -->
+                        <div class="grid grid-cols-2 gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
+                            <button 
+                                id="qr-mode-btn" 
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all bg-gradient-to-r from-red-600 to-black text-white shadow-md"
+                            >
+                                🎫 Laracon QR
+                            </button>
+                            <button 
+                                id="manual-mode-btn" 
+                                class="px-4 py-3 rounded-lg font-semibold text-sm transition-all text-gray-600 hover:bg-white"
+                            >
+                                🔐 Manual Login
+                            </button>
+                        </div>
+
+                        <!-- QR Login Section -->
+                        <div id="qr-login-section" class="">
+                            <div class="mb-6">
+                                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 border border-red-200">
+                                    <p class="text-center text-sm text-gray-700 mb-4 font-medium">Scan your Laracon badge to login instantly</p>
+                                    <div class="bg-white rounded-lg overflow-hidden shadow-inner">
+                                        <video id="qr-video" class="w-full" style="max-height: 280px; object-fit: cover;"></video>
+                                    </div>
+                                    <div id="qr-result" class="mt-3 text-center text-xs text-gray-600 font-medium"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Manual Login Section -->
+                        <div id="manual-login-section" class="hidden">
+                            <form action="{{ route('login') }}" method="POST">
+                                @csrf
+                                
+                                <div class="mb-5">
+                                    <label class="block text-gray-700 font-semibold mb-2 text-sm" for="email">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        id="email"
+                                        value="{{ old('email') }}" 
+                                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all @error('email') border-red-500 @enderror" 
+                                        placeholder="your@email.com"
+                                        required
+                                    >
+                                    @error('email')
+                                        <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-5">
+                                    <label class="block text-gray-700 font-semibold mb-2 text-sm" for="pin">6-Digit PIN</label>
+                                    <div class="flex gap-2 justify-between max-w-sm mx-auto">
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="0" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="1" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="2" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="3" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="4" />
+                                        <input type="text" maxlength="1" class="w-12 h-12 md:w-14 md:h-14 text-center text-xl md:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all pin-input" data-index="5" />
+                                    </div>
+                                    <input type="hidden" name="password" id="password-hidden" required />
+                                    @error('password')
+                                        <span class="text-red-500 text-xs mt-2 block text-center">{{ $message }}</span>
+                                    @enderror
+                                </div>
+
+                                <div class="flex items-center justify-between mb-6">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" name="remember" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
+                                        <span class="ml-2 text-gray-700 text-xs md:text-sm">Remember me</span>
+                                    </label>
+                                    <a href="#" class="text-xs md:text-sm text-red-600 hover:text-red-700 font-semibold">Forgot PIN?</a>
+                                </div>
+
+                                <button 
+                                    type="submit" 
+                                    class="w-full bg-gradient-to-r from-red-600 to-black text-white py-3 rounded-lg hover:from-red-700 hover:to-gray-900 transition-all transform hover:scale-105 font-semibold shadow-lg"
+                                >
+                                    Login to Account
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <p class="text-gray-600 text-sm">Don't have an account? <a href="{{ route('register') }}" class="text-red-600 hover:text-red-700 font-semibold">Register here</a></p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div class="mb-4 bg-green-600 text-white p-4 rounded-lg shadow-lg">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <div>
-                        <p class="font-semibold">{{ session('success') }}</p>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        <!-- Login Card -->
-        <div class="bg-white rounded-2xl shadow-2xl p-8">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-                <p class="text-gray-600">Login to your Laravel Community account</p>
-            </div>
-
-            <!-- Login Form -->
-            <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                @csrf
-
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Email Address</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required autofocus class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="your@email.com">
-                </div>
-
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">6-Digit PIN</label>
-                    <input type="tel" inputmode="numeric" pattern="[0-9]{6}" name="password" required maxlength="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-center text-2xl tracking-widest" placeholder="000000">
-                    <p class="text-xs text-gray-500 mt-1">Enter your 6-digit PIN (numbers only)</p>
-                </div>
-
-                <div class="flex items-center">
-                    <input type="checkbox" name="remember" id="remember" class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500">
-                    <label for="remember" class="ml-2 text-sm text-gray-700">Remember me</label>
-                </div>
-
-                <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-red-600 hover:to-pink-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                    Login
-                </button>
-            </form>
-
-            <!-- Register Link -->
-            <div class="mt-6 text-center">
-                <p class="text-gray-600">Don't have an account? <a href="{{ route('register') }}" class="text-red-500 hover:text-red-600 font-semibold">Register</a></p>
             </div>
         </div>
-    </div>
+    </section>
 
+    @include('partials.footer')
+
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
     <script>
-        // Enforce numeric-only input on PIN field
-        document.addEventListener('DOMContentLoaded', function() {
-            const pinInput = document.querySelector('input[name="password"]');
-            
-            if (pinInput) {
-                pinInput.addEventListener('input', function(e) {
-                    // Remove non-numeric characters
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                    // Limit to 6 digits
-                    if (this.value.length > 6) {
-                        this.value = this.value.slice(0, 6);
-                    }
-                });
+        // Mode Toggle
+        const qrModeBtn = document.getElementById('qr-mode-btn');
+        const manualModeBtn = document.getElementById('manual-mode-btn');
+        const qrSection = document.getElementById('qr-login-section');
+        const manualSection = document.getElementById('manual-login-section');
+        let scanning = false;
 
-                pinInput.addEventListener('keypress', function(e) {
-                    // Only allow numbers
-                    if (e.key && !/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            // Log form submission
-            const form = document.querySelector('form');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    console.log('📤 Login form submitting...');
-                    console.log('Email:', this.email.value);
-                    console.log('PIN length:', this.password.value.length);
-                });
-            }
+        qrModeBtn.addEventListener('click', () => {
+            qrModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            qrModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
+            manualModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            manualModeBtn.classList.add('text-gray-600', 'hover:bg-white');
+            qrSection.classList.remove('hidden');
+            manualSection.classList.add('hidden');
+            if (!scanning) startQRScanner();
         });
+
+        manualModeBtn.addEventListener('click', () => {
+            manualModeBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            manualModeBtn.classList.remove('text-gray-600', 'hover:bg-white');
+            qrModeBtn.classList.remove('bg-gradient-to-r', 'from-red-600', 'to-black', 'text-white', 'shadow-md');
+            qrModeBtn.classList.add('text-gray-600', 'hover:bg-white');
+            manualSection.classList.remove('hidden');
+            qrSection.classList.add('hidden');
+            stopQRScanner();
+            document.querySelector('.pin-input').focus();
+        });
+
+        // PIN Input Handler
+        const pinInputs = document.querySelectorAll('.pin-input');
+        const passwordHidden = document.getElementById('password-hidden');
+
+        pinInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value.length === 1 && index < pinInputs.length - 1) {
+                    pinInputs[index + 1].focus();
+                }
+                updateHiddenPassword();
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    pinInputs[index - 1].focus();
+                }
+            });
+
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').slice(0, 6);
+                pastedData.split('').forEach((char, i) => {
+                    if (pinInputs[i]) {
+                        pinInputs[i].value = char;
+                    }
+                });
+                updateHiddenPassword();
+                if (pastedData.length === 6) {
+                    pinInputs[5].focus();
+                }
+            });
+        });
+
+        function updateHiddenPassword() {
+            const pin = Array.from(pinInputs).map(input => input.value).join('');
+            passwordHidden.value = pin;
+        }
+
+        // QR Code Scanner
+        const video = document.getElementById('qr-video');
+        const resultDiv = document.getElementById('qr-result');
+        let stream = null;
+
+        async function startQRScanner() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                video.setAttribute('playsinline', true);
+                video.play();
+                scanning = true;
+                requestAnimationFrame(scanQRCode);
+                resultDiv.textContent = '📷 Camera ready - Point at Laracon badge';
+            } catch (err) {
+                resultDiv.textContent = '⚠️ Camera access denied';
+                console.error('Camera error:', err);
+            }
+        }
+
+        function stopQRScanner() {
+            scanning = false;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        function scanQRCode() {
+            if (!scanning) return;
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    resultDiv.textContent = '✅ QR detected! Authenticating...';
+                    processQRLogin(code.data);
+                    return;
+                }
+            }
+            requestAnimationFrame(scanQRCode);
+        }
+
+        function processQRLogin(qrData) {
+            scanning = false;
+            
+            fetch('{{ route('login') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    qr_code: qrData,
+                    laracon_login: true
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.textContent = '✅ Login successful! Redirecting...';
+                    window.location.href = data.redirect || '{{ route('dashboard') }}';
+                } else {
+                    resultDiv.textContent = '❌ Invalid QR code';
+                    scanning = true;
+                    requestAnimationFrame(scanQRCode);
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent = '❌ Error processing QR';
+                console.error('QR login error:', error);
+                scanning = true;
+                requestAnimationFrame(scanQRCode);
+            });
+        }
+
+        // Auto-start QR scanner
+        startQRScanner();
     </script>
 </body>
 </html>
